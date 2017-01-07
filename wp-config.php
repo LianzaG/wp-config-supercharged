@@ -15,15 +15,37 @@
 
 	@Discuss: 	https://github.com/pixeline/wp-config-supercharged/issues
 
-	@Author:
+	@Authors:
 		Alexandre Plennevaux _ alexandre@pixeline.be _ https://pixeline.be
+		Julien Bosuma _ contact@lianzadesign.com _ http://www.lianzadesign.com
+			(Adding custom wp-content (app/) folder location)
 
 *****************************************************************************/
 
-// The Main Switch:
+/*  ------------------------ GLOBAL SWITCH & CONDITIONAL FLAGS --------------------- */
+
+// The Main Switch: 'local' or 'live'
 define('CURRENT_SERVER','local');
 
-/*  ------------------------ YOUR SERVER CONFIGURATIONS --------------------- */
+// Debian/Raspbian Dev Server Switch:
+define('LINUX_DEV_SERVER', false);
+
+// WP Siteurl and Home Url Overrides Switch:
+	/**
+	 * About WP_SITEURL and WP_HOME
+	 *
+	 * @see   https://codex.wordpress.org/Editing_wp-config.php#WP_SITEURL
+	 * @see   https://codex.wordpress.org/Changing_The_Site_URL#Relocate_method
+	 *
+	 * Adding this in can reduce the number of database calls when loading your site.
+	 * NOTE: I This will 'not' change the database stored value. The url will revert to the old database value if
+	 * this line is ever removed from wp-config. You can use use the RELOCATE constant to change the siteurl value
+	 * in the database.
+	 */
+define('HARDCODE_SITEURL', false);
+
+
+/*  ------------------------ SERVER CONFIGURATIONS --------------------- */
 
 switch(CURRENT_SERVER){
 
@@ -46,17 +68,24 @@ case 'local':
 	define( 'CONCATENATE_SCRIPTS', false );
 
 	// DATABASE
-	define('DB_NAME', 'DATABASE_NAME');
-	define('DB_USER', 'DATABASE_USER');
-	define('DB_PASSWORD', 'DB_PASSWORD');
+	define('DB_NAME', 'database_name_here');
+	define('DB_USER', 'username_here');
+	define('DB_PASSWORD', 'password_here');
 	define('DB_HOST', 'localhost');
+
+	// Development Server Document Root's Subfolder:
+	// The subfolder under '/Applications/MAMP/htdocs/' (OSX) or under '/var/www/html/' (Raspbian).
+	define('DEV_SERVER_SUBFOLDER', '/subfolder_name_here'); // Use empty string if no subfolder is used.
 
 	// DOMAIN & URL
 	define('PROTOCOL', 'http://');
-	define('DOMAIN_NAME', 'domain.dev');
-	define('WP_SITEURL', PROTOCOL . DOMAIN_NAME);
-	define('PATH_TO_WP', '/'); // if your WordPress is in a subdirectory.
-	define('WP_HOME', WP_SITEURL . PATH_TO_WP); // root of your WordPress install
+	define('DOMAIN_NAME', $_SERVER['HTTP_HOST']);
+	define('PATH_TO_WP', '/wp'); // if WordPress Core is in a subdirectory.
+
+	if (LINUX_DEV_SERVER || HARDCODE_SITEURL) {
+		define('WP_SITEURL', PROTOCOL . DOMAIN_NAME . DEV_SERVER_SUBFOLDER . PATH_TO_WP); 	// path to WP Core files folder
+		define('WP_HOME', PROTOCOL . DOMAIN_NAME . DEV_SERVER_SUBFOLDER); 					// root of your WordPress site
+	}
 
 	break;
 
@@ -75,18 +104,25 @@ default:
 	define('WP_DEBUG_DISPLAY', false);
 	define('ENFORCE_GZIP', true);
 	// DATABASE
-	define('DB_NAME', 'DATABASE_NAME');
-	define('DB_USER', 'DATABASE_USER');
-	define('DB_PASSWORD', 'DB_PASSWORD');
+	define('DB_NAME', 'database_name_here');
+	define('DB_USER', 'username_here');
+	define('DB_PASSWORD', 'password_here');
 	define('DB_HOST', 'localhost');
+
+	// Development Server Document Root's Subfolder:
+	define('DEV_SERVER_SUBFOLDER', '');		// Usually empty on a production site, unless its root is in a subdirectory.
 
 	// DOMAIN & URL
 	define('PROTOCOL', 'http://');
-	define('DOMAIN_NAME', 'domain.tld');
-	define('WP_SITEURL', PROTOCOL . DOMAIN_NAME);
-	define('PATH_TO_WP', '/'); // if your WordPress is in a subdirectory.
-	define('WP_HOME', WP_SITEURL . PATH_TO_WP); // root of your WordPress install
-	// Using subdomains to serve static content (CDN) ? 
+	define('DOMAIN_NAME', $_SERVER['HTTP_HOST']);
+	define('PATH_TO_WP', '/wp'); // If WordPress Core is in a subdirectory. Empty string otherwise.
+
+	if ( HARDCODE_SITEURL ) {
+		define('WP_SITEURL', PROTOCOL . DOMAIN_NAME . DEV_SERVER_SUBFOLDER . PATH_TO_WP); 	// path to WP Core files folder
+		define('WP_HOME', PROTOCOL . DOMAIN_NAME . DEV_SERVER_SUBFOLDER); 					// root of your whole WordPress site
+	}
+
+	// Using subdomains to serve static content (CDN) ?
 	// To prevent WordPress cookies from being sent with each request to static content on your subdomain, set the cookie domain to your non-static domain only.
 	// define('COOKIE_DOMAIN', DOMAIN_NAME);
 
@@ -105,11 +141,11 @@ default:
 /*  ------------------------ SETTINGS COMMON TO ALL SERVERS  --------------------- */
 
 define('TABLE_PREFIX','cstmr_');  // Something else than the default wp_. Only numbers, letters, and underscores.
-define('WP_POST_REVISIONS', 5 ); // How many revisions to keep at max.
-define('AUTOSAVE_INTERVAL', 120); // in seconds
-define('EMPTY_TRASH_DAYS', 7); // in days (use 0 to disable trash)
+define('WP_POST_REVISIONS', 10 ); // How many revisions to keep at max.
+define('AUTOSAVE_INTERVAL', 60); // in seconds
+define('EMPTY_TRASH_DAYS', 30); // in days (use 0 to disable trash)
 
-// WORDPRESS' LANGUAGE _ Default is 'en_EN'
+// WORDPRESS' LANGUAGE _ Default is 'en_EN' // NOTE: Now obsolete and handled through the admin UI (under Settings > General)
 define('WPLANG', 'fr_FR');
 
 // DB INTERNALS
@@ -121,16 +157,16 @@ define('DB_COLLATE', '');
 // DIRECTORY CUSTOMIZATION
 // make it less obvious that your site is using wordpress.
 
-// rename wp-content folder
-// define( 'WP_CONTENT_DIR', dirname(__FILE__) . '/wp-content' );
-// define( 'WP_CONTENT_URL', WP_SITEURL.'/wp-content');
+// rename 'wp-content' folder to 'app' AND change its location.
+define( 'WP_CONTENT_DIR', dirname(__FILE__) . '/app' );
+define( 'WP_CONTENT_URL', PROTOCOL . DOMAIN_NAME . DEV_SERVER_SUBFOLDER . '/app');
 
 // rename uploads folder
-// define( 'UPLOADS', '/wp-content/uploads' );
+// define( 'UPLOADS', '/app/uploads' );
 
 // rename plugins folder
-// define( 'WP_PLUGIN_DIR', dirname(__FILE__)  . '/wp-content/plugins' );
-// define( 'WP_PLUGIN_URL', WP_SITEURL.'/wp-content/plugins');
+// define( 'WP_PLUGIN_DIR', dirname(__FILE__)  . '/app/plugins' );
+// define( 'WP_PLUGIN_URL', PROTOCOL . DOMAIN_NAME . DEV_SERVER_SUBFOLDER . '/app/plugins');
 
 // You cannot move the Themes folder, but your can register an additional theme directory
 // register_theme_directory( dirname( __FILE__ ) . '/themes-dev' );
@@ -174,7 +210,7 @@ define('NONCE_SALT',       'put something here');
 /*  ------------------------  MULTISITE MODE  --------------------- */
 
 /*
-define( 'WP_ALLOW_MULTISITE', true ); // Enable multisite mode. 
+define( 'WP_ALLOW_MULTISITE', true ); // Enable multisite mode.
 define('SUBDOMAIN_INSTALL', false); //  Leave false to use subdirectories
 define('DOMAIN_CURRENT_SITE', DOMAIN_NAME);
 define('PATH_CURRENT_SITE', '/');
