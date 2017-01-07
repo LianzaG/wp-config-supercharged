@@ -44,6 +44,9 @@ define('LINUX_DEV_SERVER', false);
 	 */
 define('HARDCODE_SITEURL', false);
 
+// Set php error reporting settings here, at runtime, only if you don't have access to the prefered 'php.ini' file.
+define('CANNOT_EDIT_PHP_INI', true);
+
 
 /*  ------------------------ SERVER CONFIGURATIONS --------------------- */
 
@@ -58,6 +61,16 @@ case 'local':
 	define('WP_CACHE', false);
 	define('WP_DEBUG', true);
 	define('SAVEQUERIES', false);
+
+	if (CANNOT_EDIT_PHP_INI && WP_DEBUG) {
+		// Set these to your convenience.
+		@ini_set( 'log_errors', 'Off' );
+		@ini_set( 'display_errors', 'On' );
+		// @ini_set( 'error_log', '/home/example.com/logs/php_error.log' );
+	} elseif (!WP_DEBUG) {
+		@ini_set( 'log_errors', 'Off' );
+		@ini_set( 'display_errors', 'Off' );
+	}
 	define('WP_DEBUG_LOG', false);
 	define('WP_DEBUG_DISPLAY', true);
 	/*
@@ -96,10 +109,15 @@ default:
 	****************************************/
 	define('WP_CACHE', true);
 	define('WP_DEBUG', false);
+	if (CANNOT_EDIT_PHP_INI) {
+		@ini_set( 'log_errors', WP_DEBUG ? 'On' : 'Off' );
+		@ini_set( 'display_errors', 'Off' );
+		// @ini_set( 'error_log', '/home/example.com/logs/php_error.log' );
+	}
 	define('SAVEQUERIES', false);
 	define( 'SCRIPT_DEBUG', false);
 	define( 'CONCATENATE_SCRIPTS', true );
-	// log errors in a file (wp-content/debug.log), don't show them to end-users.
+	// When WP_DEBUG is true: log errors in a file (wp-content/debug.log OR custom ini_set()), don't show them to end-users.
 	define('WP_DEBUG_LOG', true);
 	define('WP_DEBUG_DISPLAY', false);
 	define('ENFORCE_GZIP', true);
@@ -145,7 +163,8 @@ define('WP_POST_REVISIONS', 10 ); // How many revisions to keep at max.
 define('AUTOSAVE_INTERVAL', 60); // in seconds
 define('EMPTY_TRASH_DAYS', 30); // in days (use 0 to disable trash)
 
-// WORDPRESS' LANGUAGE _ Default is 'en_EN' // NOTE: Now obsolete and handled through the admin UI (under Settings > General)
+// WORDPRESS' LANGUAGE _ Default is 'en_EN'
+// // NOTE: Now obsolete and handled through the admin UI (under Settings > General) but used here to later set the server's locale.
 define('WPLANG', 'fr_FR');
 
 // DB INTERNALS
