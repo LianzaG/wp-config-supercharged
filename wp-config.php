@@ -4,12 +4,12 @@
  * ready for a new project.
  *
  * Usage 	Adapt the settings to your need.
- * 			There is a switch allowing you to use different configurations
- * 			(e.g: "local", "staging", "production").
- * 			Set your variables and just remove what you don't need.
+ * 		There is a switch allowing you to use different configurations
+ * 		(e.g: "local", "staging", "production").
+ * 		Set your variables and just remove what you don't need.
  *
  * Learn 	Basic:		@link http://codex.wordpress.org/Editing_wp-config.php
- * 			Advanced:	@link http://premium.wpmudev.org/blog/wordpress-wp-config-file-guide/
+ * 		Advanced:	@link http://premium.wpmudev.org/blog/wordpress-wp-config-file-guide/
  *
  * Discuss 	@link https://github.com/pixeline/wp-config-supercharged/issues
  *
@@ -96,7 +96,7 @@ switch( CURRENT_SERVER )
 		// DOMAIN & URL
 		define('PROTOCOL',    'http://');
 		define('DOMAIN_NAME', $_SERVER['HTTP_HOST']);
-		define('PATH_TO_WP',  '/wp/'); 					// Use "/" if wp core files are not in a subdirectory.
+		define('PATH_TO_WP',  '/wp/');                     // Use "/" if wp core files are not in a subdirectory.
 
 		/**
 		 * Development Server Document Root - Project Subfolder.
@@ -163,8 +163,8 @@ switch( CURRENT_SERVER )
 		define('DEV_SERVER_SUBFOLDER', '');
 
 		if ( HARDCODE_SITEURL ) {
-			define('WP_SITEURL', PROTOCOL . DOMAIN_NAME . DEV_SERVER_SUBFOLDER . PATH_TO_WP); 	// path to WP Core files folder
-			define('WP_HOME',    PROTOCOL . DOMAIN_NAME . DEV_SERVER_SUBFOLDER); 				// root of your whole WordPress site
+			define('WP_SITEURL', PROTOCOL . DOMAIN_NAME . DEV_SERVER_SUBFOLDER . PATH_TO_WP); // path to WP Core files folder
+			define('WP_HOME',    PROTOCOL . DOMAIN_NAME . DEV_SERVER_SUBFOLDER);              // root of your whole WordPress site
 		}
 
 		/*
@@ -191,10 +191,10 @@ switch( CURRENT_SERVER )
 
 // ------------------------  SETTINGS COMMON TO ALL SERVERS  --------------------- //
 
-define('TABLE_PREFIX',      'cstmr_');  // Something else than the default wp_. Only numbers, letters, and underscores.
-define('WP_POST_REVISIONS', 10 );		// How many revisions to keep at max.
-define('AUTOSAVE_INTERVAL', 60); 		// in seconds
-define('EMPTY_TRASH_DAYS',  30); 		// in days (use 0 to disable trash)
+define('TABLE_PREFIX',      'cstmr_'); // Something else than the default wp_. Only numbers, letters, and underscores.
+define('WP_POST_REVISIONS', 10 );      // How many revisions to keep at max.
+define('AUTOSAVE_INTERVAL', 60);       // in seconds
+define('EMPTY_TRASH_DAYS',  30);       // in days (use 0 to disable trash)
 
 /*
  * WPLANG. Default is 'en_EN'.
@@ -287,7 +287,7 @@ define('NONCE_SALT',       'put something here');
 
 // MEMORY ALLOCATION
 // define('WP_MEMORY_LIMIT',     '32M');
-// define('WP_MAX_MEMORY_LIMIT', '32M');  			    // Admin area specifically.
+// define('WP_MAX_MEMORY_LIMIT', '32M');                // Admin area specifically.
 // define('WP_DEFAULT_THEME',    'twentyeleven');       // Custom Default Theme.
 
 // Custom Database Table for Users
